@@ -4,19 +4,20 @@ import 'dotenv/config'
 
 // Create the agent
 const agent = new Agent({
-  systemPrompt: 'You are an agent that sums two numbers'
+  systemPrompt: `You are an AI agent that creates a structured podcast script with at least two distinct speakers, each possessing a unique personality and emotional tone. Use the user’s topic as the foundation, ensuring the dialogue spans at least 20 sentences and concludes naturally. Incorporate warmth, humor, or other emotional nuances where fitting. Provide only the script, and do not include any commentary or additional text beyond it.`
 })
 
-// Add sum capability
+
+// Add generate_podcast_script capability
 agent.addCapability({
-  name: 'sum',
-  description: 'Sums two numbers',
+  name: 'generate_podcast_script',
+  description: 'Generates a podcast script with at least 2 speakers based on a topic',
   schema: z.object({
-    a: z.number(),
-    b: z.number()
+    topic: z.string()
   }),
   async run({ args }) {
-    return `${args.a} + ${args.b} = ${args.a + args.b}`
+    // In a real scenario, you would call an LLM here to generate the script
+    return `Podcast script generated for topic: ${args.topic}. [Speaker 1: Hello...] [Speaker 2: Hi...]`
   }
 })
 
@@ -24,16 +25,16 @@ agent.addCapability({
 agent.start()
 
 async function main() {
-  const sum = await agent.process({
+  const podcastScript = await agent.process({
     messages: [
       {
         role: 'user',
-        content: 'add 13 and 29'
+        content: 'Generate a podcast script about the future of AI'
       }
     ]
   })
 
-  console.log('Sum:', sum.choices[0].message.content)
+  console.log('Podcast Script:', podcastScript.choices[0].message.content)
 }
 
 main().catch(console.error)
