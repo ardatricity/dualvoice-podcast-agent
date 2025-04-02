@@ -26,7 +26,7 @@ This project demonstrates how to build a multi-capability OpenServ agent using:
 ### `generate_podcast_script`
 
 - **Input:** Podcast script
-- **Output:** JSON with dialogues per speaker, converted using OpenAI's GPT-4o model
+- **Output:** Converts the podcast script into JSON with dialogues per speaker, using OpenAI's GPT-4o model
 - **Model Used:** `gpt-4o`
 
 ### `textToSpeech`
