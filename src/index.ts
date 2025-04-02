@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { Agent } from '@openserv-labs/sdk'
 import 'dotenv/config'
+import axios from 'axios'
 
 // Create the agent
 const agent = new Agent({
@@ -21,6 +22,43 @@ agent.addCapability({
   }
 })
 
+// Add convert_script_to_audio capability (basit sürüm)
+agent.addCapability({
+  name: 'convert_script_to_audio',
+  description: 'Converts the entire podcast script into an audio file using ElevenLabs, returning base64.',
+  schema: z.object({
+    script: z.string()
+  }),
+  async run({ args }) {
+    const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY
+    if (!ELEVENLABS_API_KEY) {
+      throw new Error('ELEVENLABS_API_KEY not set in environment.')
+    }
+
+    // Basit tek parça TTS: Tüm script tek bir istekle.
+    const voiceId = '21m00Tcm4TlvDq8ikWAM' // Örnek: "Rachel"
+    const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`
+
+    const data = {
+      text: args.script,
+      model_id: 'eleven_multilingual_v2'
+    }
+
+    // POST isteği (binary mp3 almak için responseType: 'arraybuffer')
+    const response = await axios.post(url, data, {
+      headers: {
+        'xi-api-key': ELEVENLABS_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      responseType: 'arraybuffer'
+    })
+
+    // MP3 verisini base64 string'e çevir
+    const base64Audio = Buffer.from(response.data).toString('base64')
+    return `data:audio/mpeg;base64,${base64Audio}`
+  }
+})
+
 // Start the agent's HTTP server
 agent.start()
 
@@ -34,7 +72,21 @@ async function main() {
     ]
   })
 
-  console.log('Podcast Script:', podcastScript.choices[0].message.content)
+  const script = podcastScript.choices[0].message.content
+  console.log('Podcast Script:', script)
+
+  // 2) Convert that script to audio
+  const audioResult = await agent.process({
+    messages: [
+      {
+        role: 'user',
+        content: 'Convert the script to audio: ' + script
+      }
+    ]
+  })
+
+  // Agent, MP3'ün base64 halini döndürür
+  console.log('Audio (base64):', audioResult.choices[0].message.content)
 }
 
 main().catch(console.error)
