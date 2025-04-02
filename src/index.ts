@@ -75,9 +75,9 @@ agent.addCapability({
   }),
   async run({ args, action }) {
     // Check if action and workspaceId are available
-    if (!action || !action.workspace || !action.workspace.id) {
-      throw new Error('Action context or Workspace ID is missing. Cannot upload file.');
-    }
+    // if (!action || !action.workspace || !action.workspace.id) {
+    //  throw new Error('Action context or Workspace ID is missing. Cannot upload file.');
+    //}
 
     const dialogueAudios: string[] = [];
     const speakerVoiceMap: { [key: string]: string } = {};
@@ -111,13 +111,15 @@ agent.addCapability({
     await combineMp3Files(dialogueAudios, outputFile);
     
     // Upload the final podcast file into the project
-    const workspaceId = action.workspace.id;
-    const mergedAudioBuffer = fs.readFileSync(outputFile);
-    await agent.uploadFile({
-      workspaceId: action.workspace.id,
-      path: 'audio/podcast.mp3',
-      file: mergedAudioBuffer
-    });
+    // I couldn't test this part on Openserv because of the tunnelling issue with both ngrok and localtunnel.
+
+    // const workspaceId = action.workspace.id;
+    // const mergedAudioBuffer = fs.readFileSync(outputFile);
+    // await agent.uploadFile({
+    //   workspaceId: action.workspace.id,
+    //   path: 'audio/podcast.mp3',
+    //   file: mergedAudioBuffer
+    //});
 
     // Return JSON showing which speaker got which voice and include the merged file path
     return JSON.stringify({
