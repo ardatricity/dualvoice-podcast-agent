@@ -1,62 +1,94 @@
-# DualVoice Podcast Agent
+# 🎹 Podcast Script & TTS Agent (OpenServ)
 
-An **AI-driven** agent that **generates multi-speaker podcast scripts** based on user-provided topics. 
-
-## Features
-
-- **Script Generation**  
-  Produces a podcast script containing at least two distinct speakers with different personalities and tones.
-- **Structured, Long-Form Dialogue**  
-  Ensures a coherent conversation flow spanning ~20+ sentences, concluding naturally.
-- **Topic-Focused**  
-  Adapts the script to any user-defined topic (e.g., technology, travel, finance).
-
-## Capabilities
-
-### generate_podcast_script
-Generates a detailed podcast script based on specified criteria:
-- `topic` *(string)* — The subject or theme of the podcast (e.g., “The future of AI”)
-
-The agent responds with a multi-speaker script addressing the specified topic.
-
-## Example Queries
-
-```
-"Generate a podcast script about the impact of social media"
-"Create a multi-speaker podcast discussing mental health awareness"
-"Write a podcast dialogue on space exploration"
-```
-
-## Output Format
-
-The agent returns a structured script. For example:
-
-```text
-Podcast Script: Here's a podcast script on "The Future of AI":
+This OpenServ agent generates structured podcast scripts from a topic and converts the script into a multi-speaker audio file using different TTS voices. It also merges and uploads the final audio to your OpenServ workspace.
 
 ---
 
-**[Speaker 1: Host - Alex]**
-Hello, everyone, and welcome back to "Tech Tomorrow," your favorite podcast ...
+## 📦 Project Description
 
-**[Speaker 2: Expert - Dr. Jen Lee]**
-Hi, Alex! It's great to be here again. AI is such an exciting field ...
+This project demonstrates how to build a multi-capability OpenServ agent using:
 
-...
+- OpenAI's GPT-4o for generating structured podcast scripts
+- OpenAI TTS (text-to-speech) for converting scripts into realistic voices
+- FFmpeg for merging audio files
+- OpenServ SDK for running, managing, and uploading files
 
-**[Alex]**
-Thank you, Dr. Lee, for joining us and sharing these insights. Until next time, goodbye!
+### 💡 Example Use Case
+
+> "Generate a podcast about AI trends in 2025"
+
+🎧 Output: An MP3 podcast with different voice actors representing speakers.
+
+---
+
+## 🧠 Capabilities
+
+### `generate_podcast_script`
+
+- **Input:** Podcast script
+- **Output:** JSON with dialogues per speaker, converted using OpenAI's GPT-4o model
+- **Model Used:** `gpt-4o`
+
+### `textToSpeech`
+
+- **Input:** JSON with speaker/dialogue pairs
+- **Output:**
+  - Individual MP3 files for each line
+  - Final merged podcast `podcast.mp3`
+  - Upload to OpenServ workspace via `agent.uploadFile`
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/ardatricity/dualvoice-podcast-agent.git
+cd dualvoice-podcast-agent
 ```
 
+### 2. Install dependencies
 
-## Configuration
+```bash
+npm install
+```
 
-- **System prompt** and behavior are defined in your `index.ts`.
-- **generate_podcast_script** logic is located within your capability definitions.
+### 3. Setup environment variables
 
-## Contributing
+Create a `.env` file in the root directory:
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to modify. 
+```env
+OPENAI_API_KEY=your_openai_api_key
+OPENSERV_API_KEY=your_openserv_api_key
+```
+
+### 4. Install FFmpeg
+
+Ensure FFmpeg is installed and accessible from your CLI.
+
+- macOS: `brew install ffmpeg`
+- Ubuntu: `sudo apt install ffmpeg`
+- Windows: [Download FFmpeg](https://ffmpeg.org/download.html) and add to PATH
+
+---
+
+## 🧪 Testing the Agent
+
+Run the agent:
+
+```bash
+npm run dev
+```
+
+The `main()` function will:
+
+1. Call `generate_podcast_script` with the topic `AI trends in 2025`
+2. Parse the JSON response
+3. Pass the dialogues to `textToSpeech`
+4. Merge the audio and upload the final podcast file (`podcast.mp3`) to OpenServ
+
+---
 
 ## License
 
