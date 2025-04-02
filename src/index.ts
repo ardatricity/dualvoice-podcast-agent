@@ -73,7 +73,12 @@ agent.addCapability({
       dialogue: z.string()
     }))
   }),
-  async run({ args }) {
+  async run({ args, action }) {
+    // Check if action and workspaceId are available
+    if (!action || !action.workspace || !action.workspace.id) {
+      throw new Error('Action context or Workspace ID is missing. Cannot upload file.');
+    }
+
     const dialogueAudios: string[] = [];
     const speakerVoiceMap: { [key: string]: string } = {};
 
@@ -101,9 +106,18 @@ agent.addCapability({
       console.log(`Created TTS file for speaker=${speaker}, voice=${voice}: ${audioFileName}`);
     }
 
-    // 2) After the loop, merge all generated MP3s
+    // After the loop, merge all generated MP3s
     const outputFile = path.join(__dirname, 'podcast.mp3');
     await combineMp3Files(dialogueAudios, outputFile);
+    
+    // Upload the final podcast file into the project
+    const workspaceId = action.workspace.id;
+    const mergedAudioBuffer = fs.readFileSync(outputFile);
+    await agent.uploadFile({
+      workspaceId: action.workspace.id,
+      path: 'audio/podcast.mp3',
+      file: mergedAudioBuffer
+    });
 
     // Return JSON showing which speaker got which voice and include the merged file path
     return JSON.stringify({
