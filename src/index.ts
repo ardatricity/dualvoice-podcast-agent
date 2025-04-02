@@ -111,7 +111,7 @@ agent.addCapability({
     await combineMp3Files(dialogueAudios, outputFile);
     
     // Upload the final podcast file into the project
-    // I couldn't test this part on Openserv because of the tunnelling issue with both ngrok and localtunnel.
+    // I could not test this part on Openserv because of the tunnelling issue with both ngrok and localtunnel.
 
     // const workspaceId = action.workspace.id;
     // const mergedAudioBuffer = fs.readFileSync(outputFile);
