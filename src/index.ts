@@ -9,8 +9,8 @@ const agent = new Agent({
 })
 
 
-// Add generate_podcast_script capability
-agent.addCapability({
+agent.addCapabilities([{
+  // Add generate_podcast_script capability
   name: 'generate_podcast_script',
   description: 'Generates a podcast script with at least 2 speakers based on a topic',
   schema: z.object({
@@ -20,10 +20,9 @@ agent.addCapability({
     // In a real scenario, you would call an LLM here to generate the script
     return `Podcast script generated for topic: ${args.topic}. [Speaker 1: Hello...] [Speaker 2: Hi...]`
   }
-})
-
-// Add convert_script_to_audio capability (basit sürüm)
-agent.addCapability({
+},
+// Add convert_script_to_audio capability 
+{
   name: 'convert_script_to_audio',
   description: 'Converts the entire podcast script into an audio file using ElevenLabs, returning base64.',
   schema: z.object({
@@ -35,8 +34,8 @@ agent.addCapability({
       throw new Error('ELEVENLABS_API_KEY not set in environment.')
     }
 
-    // Basit tek parça TTS: Tüm script tek bir istekle.
-    const voiceId = '21m00Tcm4TlvDq8ikWAM' // Örnek: "Rachel"
+    // 
+    const voiceId = '21m00Tcm4TlvDq8ikWAM' // Example: "Rachel"
     const url = `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`
 
     const data = {
@@ -44,7 +43,7 @@ agent.addCapability({
       model_id: 'eleven_multilingual_v2'
     }
 
-    // POST isteği (binary mp3 almak için responseType: 'arraybuffer')
+    // POST request
     const response = await axios.post(url, data, {
       headers: {
         'xi-api-key': ELEVENLABS_API_KEY,
@@ -57,7 +56,7 @@ agent.addCapability({
     const base64Audio = Buffer.from(response.data).toString('base64')
     return `data:audio/mpeg;base64,${base64Audio}`
   }
-})
+}])
 
 // Start the agent's HTTP server
 agent.start()
@@ -73,7 +72,8 @@ async function main() {
   })
 
   const script = podcastScript.choices[0].message.content
-  console.log('Podcast Script:', script)
+  
+  console.log('Podcast Script:', podcastScript.choices)
 
   // 2) Convert that script to audio
   const audioResult = await agent.process({
@@ -85,7 +85,7 @@ async function main() {
     ]
   })
 
-  // Agent, MP3'ün base64 halini döndürür
+ 
   console.log('Audio (base64):', audioResult.choices[0].message.content)
 }
 
